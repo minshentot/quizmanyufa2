@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>初二华语理解综合测验</title>
+<style>
+:root{
+  --navy:#0e2440; --navy2:#163c66; --cyan:#24b6c8; --gold:#f2b84b;
+  --ink:#14202f; --muted:#657286; --line:#dce5ee; --paper:#ffffff;
+  --ok:#0f8a5f; --okbg:#e8f7f1; --bad:#c33c43; --badbg:#fff0f1;
+  --panel:#f4f8fb;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",Arial,sans-serif;color:var(--ink)}
+body{
+  background:
+    radial-gradient(circle at 12% 14%, rgba(36,182,200,.16), transparent 26%),
+    radial-gradient(circle at 88% 12%, rgba(242,184,75,.12), transparent 20%),
+    linear-gradient(135deg,#081827 0%,#0d2743 44%,#102f4c 100%);
+  background-attachment:fixed;
+}
+.shell{width:min(1060px,94vw);margin:0 auto;padding:26px 0 40px}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;gap:14px;
+  color:#fff;margin-bottom:18px
+}
+.brand h1{font-size:24px;margin:0 0 5px;letter-spacing:.04em}
+.brand p{margin:0;color:#c8d7e6;font-size:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit}
+.ghost,.primary{
+  border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:8px 12px;cursor:pointer;font-weight:700
+}
+.ghost{background:rgba(255,255,255,.08);color:#fff}
+.primary{background:var(--cyan);color:#072637;border-color:transparent}
+.dashboard{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px
+}
+.stat{
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);
+  backdrop-filter:blur(10px);border-radius:13px;padding:10px 12px;color:white
+}
+.stat small{display:block;color:#afc4d7;font-size:10px;letter-spacing:.08em}
+.stat b{font-size:19px}
+.progressWrap{height:8px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;margin:12px 0 18px}
+.progress{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),#67d6c0);transition:.25s}
+.card{
+  background:rgba(255,255,255,.98);border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.25);
+  overflow:hidden;border:1px solid rgba(255,255,255,.5)
+}
+.cardHead{padding:18px 22px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center}
+.meta{display:flex;gap:8px;flex-wrap:wrap}
+.pill{font-size:10px;font-weight:800;letter-spacing:.05em;border-radius:999px;padding:4px 9px;background:#e9f6f8;color:#0a6e7a}
+.qnum{font-size:11px;color:var(--muted)}
+.cardBody{padding:24px 24px 20px}
+.question{white-space:pre-line;font-size:21px;line-height:1.65;font-weight:750;min-height:82px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.opt{
+  position:relative;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:14px 14px 14px 52px;min-height:56px;cursor:pointer;transition:.15s;font-size:14px;line-height:1.45
+}
+.opt:hover{border-color:#8cbfd0;transform:translateY(-1px);box-shadow:0 7px 20px rgba(23,55,94,.08)}
+.opt .letter{
+  position:absolute;left:13px;top:12px;width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;background:#edf3f8;color:#294f70;font-weight:900
+}
+.opt.correct{background:var(--okbg);border-color:#84cbb0;color:#075c40}
+.opt.correct .letter{background:var(--ok);color:white}
+.opt.wrong{background:var(--badbg);border-color:#e1a2a7;color:#8d272e}
+.opt.wrong .letter{background:var(--bad);color:white}
+.opt.disabled{cursor:default;transform:none}
+.explain{
+  display:none;margin-top:18px;padding:15px 16px;border-radius:12px;background:var(--panel);border-left:4px solid var(--cyan)
+}
+.explain.show{display:block}
+.explain .answer{font-weight:900;color:var(--navy)}
+.explain .lesson{display:inline-block;margin-top:8px;padding:3px 8px;border-radius:999px;background:#e8eef6;color:#34506d;font-size:10px;font-weight:800}
+.navrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px}
+.next{
+  margin-left:auto;border:0;border-radius:10px;background:var(--navy);color:#fff;
+  padding:10px 18px;font-weight:800;cursor:pointer
+}
+.next:disabled{opacity:.4;cursor:not-allowed}
+.hint{font-size:11px;color:var(--muted)}
+.milestones{
+  margin-top:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  color:#d7e3ee;border-radius:14px;padding:10px 12px;font-size:11px
+}
+.milestones span{display:inline-flex;align-items:center;justify-content:center;min-width:34px;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.08);margin:3px}
+.milestones span.hit{background:var(--gold);color:#3e2c05;font-weight:900}
+.result{display:none;padding:34px;text-align:center}
+.result.show{display:block}
+.result h2{font-size:30px;color:var(--navy);margin:0 0 6px}
+.result .scoreBig{font-size:54px;font-weight:900;color:var(--cyan);margin:4px 0}
+.breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:22px auto;max-width:720px}
+.breakItem{background:#f4f7fa;border:1px solid var(--line);padding:10px;border-radius:10px;font-size:12px}
+.toast{
+  position:fixed;top:18px;left:50%;transform:translate(-50%,-18px);opacity:0;pointer-events:none;
+  background:#071b2c;color:#fff;border:1px solid rgba(255,255,255,.16);border-radius:12px;
+  padding:10px 14px;font-weight:800;transition:.25s;z-index:99;box-shadow:0 16px 40px rgba(0,0,0,.28)
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.legend{font-size:10px;color:#b9cbda;margin-top:8px}
+.footer{color:#a9bed0;font-size:10px;text-align:center;margin-top:16px}
+@media(max-width:760px){
+  .dashboard{grid-template-columns:repeat(2,1fr)}
+  .options{grid-template-columns:1fr}
+  .question{font-size:18px}
+  .topbar{align-items:flex-start;flex-direction:column}
+  .breakdown{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">
+      <h1>初二华语理解综合测验</h1>
+      <p>每轮随机 50 题｜选择题 A–D｜作答后即时题解</p>
+    </div>
+    <div class="actions">
+      <button class="ghost" id="soundBtn">🔊 音效：开</button>
+      <button class="primary" id="restartBtn">↻ 新一轮 50 题</button>
+    </div>
+  </div>
+
+  <div class="dashboard">
+    <div class="stat"><small>进度</small><b id="statProgress">1 / 50</b></div>
+    <div class="stat"><small>答对</small><b id="statCorrect">0</b></div>
+    <div class="stat"><small>答错</small><b id="statWrong">0</b></div>
+    <div class="stat"><small>正确率</small><b id="statRate">0%</b></div>
+    <div class="stat"><small>题库</small><b>200</b></div>
+  </div>
+
+  <div class="progressWrap"><div class="progress" id="progress"></div></div>
+
+  <section class="card" id="quizCard">
+    <div class="cardHead">
+      <div class="meta">
+        <span class="pill" id="catPill">—</span>
+        <span class="pill" id="lessonPill">—</span>
+      </div>
+      <div class="qnum" id="qnum">Question</div>
+    </div>
+    <div class="cardBody">
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="explain" id="explain"></div>
+      <div class="navrow">
+        <div class="hint">选择答案后会显示正确答案与简要题解。</div>
+        <button class="next" id="nextBtn" disabled>下一题 →</button>
+      </div>
+    </div>
+    <div class="result" id="result"></div>
+  </section>
+
+  <div class="milestones">
+    答对里程碑音效：
+    <span data-m="3">3</span><span data-m="5">5</span><span data-m="10">10</span>
+    <span data-m="20">20</span><span data-m="30">30</span>
+    <div class="legend">每个里程碑使用不同音效；同一轮只触发一次。</div>
+  </div>
+  <div class="footer">题目会在每轮随机抽取，选项顺序也会重新打乱。</div>
+</div>
+
+<script>
+const BANK = [{"id": 1, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“一根”中的“一”应读作哪一个声调？", "correct": "yì（第四声）", "options": ["yì（第四声）", "yī（第一声）", "yí（第二声）", "轻声 yi"], "explanation": "“一”在第一、二、三声前读第四声。‘根 gēn’是第一声，所以读 yì。"}, {"id": 2, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“一壶”中的“一”应读作哪一个声调？", "correct": "yì（第四声）", "options": ["yì（第四声）", "yī（第一声）", "yí（第二声）", "轻声 yi"], "explanation": "‘壶 hú’是第二声；“一”在第一、二、三声前读 yì。"}, {"id": 3, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“一等”中的“一”应读作哪一个声调？", "correct": "yì（第四声）", "options": ["yì（第四声）", "yī（第一声）", "yí（第二声）", "轻声 yi"], "explanation": "‘等 děng’是第三声；“一”在第一、二、三声前读 yì。"}, {"id": 4, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“一件”中的“一”应读作哪一个声调？", "correct": "yí（第二声）", "options": ["yí（第二声）", "yī（第一声）", "yì（第四声）", "轻声 yi"], "explanation": "‘件 jiàn’是第四声；“一”在第四声前变读第二声 yí。"}, {"id": 5, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“不多”中的“不”应读作哪一个声调？", "correct": "bù（第四声）", "options": ["bù（第四声）", "bú（第二声）", "轻声 bu", "bū（第一声）"], "explanation": "‘多 duō’是第一声；“不”在非第四声前保持第四声 bù。"}, {"id": 6, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“不凡”中的“不”应读作哪一个声调？", "correct": "bù（第四声）", "options": ["bù（第四声）", "bú（第二声）", "轻声 bu", "bū（第一声）"], "explanation": "‘凡 fán’是第二声；“不”仍读第四声 bù。"}, {"id": 7, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“不理”中的“不”应读作哪一个声调？", "correct": "bù（第四声）", "options": ["bù（第四声）", "bú（第二声）", "轻声 bu", "bū（第一声）"], "explanation": "‘理 lǐ’是第三声；“不”仍读第四声 bù。"}, {"id": 8, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“不错”中的“不”应读作哪一个声调？", "correct": "bú（第二声）", "options": ["bú（第二声）", "bù（第四声）", "轻声 bu", "bū（第一声）"], "explanation": "‘错 cuò’是第四声；“不”在第四声前变读第二声 bú。"}, {"id": 9, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“试一试”中间的“一”一般读作什么？", "correct": "轻声 yi", "options": ["轻声 yi", "yī（第一声）", "yí（第二声）", "yì（第四声）"], "explanation": "“一”位于重叠结构中间时读轻声，如“试一试”。"}, {"id": 10, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“来不来”中间的“不”一般读作什么？", "correct": "轻声 bu", "options": ["轻声 bu", "bù（第四声）", "bú（第二声）", "bū（第一声）"], "explanation": "“不”位于重叠结构中间时读轻声，如“来不来”。"}, {"id": 11, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“第一”中的“一”应怎样读？", "correct": "读原调 yī", "options": ["读原调 yī", "读 yí", "读 yì", "读轻声 yi"], "explanation": "“一”在词尾等特定位置可读原本的第一声，讲义例子是“第一”。"}, {"id": 12, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“要不”中的“不”应怎样读？", "correct": "读原调 bù", "options": ["读原调 bù", "读 bú", "读轻声 bu", "读 bū"], "explanation": "“不”在“要不”中按讲义读原调 bù。"}, {"id": 13, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“花啊”中的“啊”读音最接近哪一个？", "correct": "ya（呀）", "options": ["ya（呀）", "wa（哇）", "na（哪）", "ra"], "explanation": "前一音节韵母为 a 时，“啊”发生音变，读作 ya。"}, {"id": 14, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“好啊”中的“啊”读音最接近哪一个？", "correct": "wa（哇）", "options": ["wa（哇）", "ya（呀）", "na（哪）", "nga"], "explanation": "前一音节以 ao 结尾，按规则“啊”读 wa。"}, {"id": 15, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“天啊”中的“啊”读音最接近哪一个？", "correct": "na（哪）", "options": ["na（哪）", "ya（呀）", "wa（哇）", "ra"], "explanation": "前一音节以 n 结尾，“啊”读 na。"}, {"id": 16, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“望啊”中的“啊”读音最接近哪一个？", "correct": "nga", "options": ["nga", "na（哪）", "ya（呀）", "za"], "explanation": "前一音节以 ng 结尾，“啊”读 nga。"}, {"id": 17, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“孩子啊”中的“啊”读音最接近哪一个？", "correct": "za", "options": ["za", "ya（呀）", "wa（哇）", "ra"], "explanation": "zi、ci、si 后面的“啊”按讲义读 za。"}, {"id": 18, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“事啊”中的“啊”读音最接近哪一个？", "correct": "ra", "options": ["ra", "za", "na（哪）", "wa（哇）"], "explanation": "zhi、chi、shi、ri、er 后面的“啊”按讲义读 ra。"}, {"id": 19, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "下列哪一项最符合“轻声”的特点？", "correct": "又轻又短，没有固定调号", "options": ["又轻又短，没有固定调号", "声音特别高而长", "一定读第一声", "一定出现在名词前"], "explanation": "轻声的核心特点是读得轻、短，并没有固定调号。"}, {"id": 20, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "下列哪一组属于讲义中常读轻声的结构助词？", "correct": "的、地、得、着、了、过", "options": ["的、地、得、着、了、过", "和、与、或、但是", "你、我、他、她", "在、从、向、往"], "explanation": "讲义列出的结构助词“的、地、得、着、了、过”常读轻声。"}, {"id": 21, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“教室里”中的“里”为什么常读轻声？", "correct": "它是名词后面的方位词", "options": ["它是名词后面的方位词", "它是量词", "它是成语的一部分", "它是反问词"], "explanation": "名词、代词后面的方位词如“里、上、下、边”等常读轻声。"}, {"id": 22, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“妹妹”中的第二个“妹”为什么常读轻声？", "correct": "重叠名词的第二个音节常轻读", "options": ["重叠名词的第二个音节常轻读", "因为它是第四声", "因为它是方位词", "因为它后面有标点"], "explanation": "讲义指出，名词或动词重叠时，后一个音节常读轻声。"}, {"id": 23, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "下列哪一项最符合“孩子”中“子”的轻声条件？", "correct": "“子”作为没有实质意义的词尾", "options": ["“子”作为没有实质意义的词尾", "“子”表示古代老师", "“子”是句子主语", "所有“子”字都必须轻读"], "explanation": "“子、头、么、们、儿”等作为无实义词尾时常读轻声；有实质含义时不一定轻读。"}, {"id": 24, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“号码儿”的拼音写法按笔记应是哪一个？", "correct": "hào mǎr", "options": ["hào mǎr", "hào mǎ er", "hào mǎng", "hào mǎn"], "explanation": "儿化时“儿”并非单独成音节；讲义例子“号码儿”写作 hào mǎr。"}, {"id": 25, "category": "汉语拼音", "lesson": "汉语拼音", "prompt": "“一点儿”的拼音写法按笔记应是哪一个？", "correct": "yì diǎnr", "options": ["yì diǎnr", "yí diǎn er", "yì diǎng", "yī diǎnr"], "explanation": "末尾 n 在儿化中按讲义处理后写作 r，因此“一点儿”写作 yì diǎnr。"}, {"id": 26, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“创新”一般属于哪一种感情色彩？", "correct": "褒义词", "options": ["褒义词", "中性词", "贬义词", "无法判断"], "explanation": "“创新”通常带有肯定、赞扬的意味，属于褒义词。"}, {"id": 27, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“和谐”一般属于哪一种感情色彩？", "correct": "褒义词", "options": ["褒义词", "中性词", "贬义词", "无法判断"], "explanation": "“和谐”通常表达正面、肯定的状态，属于褒义词。"}, {"id": 28, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“温文尔雅”一般属于哪一种感情色彩？", "correct": "褒义词", "options": ["褒义词", "中性词", "贬义词", "无法判断"], "explanation": "“温文尔雅”用于称赞人的举止文雅，带明显褒义。"}, {"id": 29, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“大显身手”一般属于哪一种感情色彩？", "correct": "褒义词", "options": ["褒义词", "中性词", "贬义词", "无法判断"], "explanation": "“大显身手”指充分展现本领，通常带肯定和赞赏。"}, {"id": 30, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“结果”一般属于哪一种感情色彩？", "correct": "中性词", "options": ["中性词", "褒义词", "贬义词", "讽刺词"], "explanation": "“结果”本身只说明事情的结局，没有明显赞扬或贬斥。"}, {"id": 31, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“浓烟”一般属于哪一种感情色彩？", "correct": "中性词", "options": ["中性词", "褒义词", "贬义词", "讽刺词"], "explanation": "“浓烟”主要描述客观现象，本身不必然带褒贬。"}, {"id": 32, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“主义”一般属于哪一种感情色彩？", "correct": "中性词", "options": ["中性词", "褒义词", "贬义词", "讽刺词"], "explanation": "“主义”本身是中性表达，具体感情色彩要看语境。"}, {"id": 33, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“动心”一般属于哪一种感情色彩？", "correct": "中性词", "options": ["中性词", "褒义词", "贬义词", "讽刺词"], "explanation": "“动心”本身不直接表示赞扬或批评，通常视为中性。"}, {"id": 34, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“淡薄”一般属于哪一种感情色彩？", "correct": "中性词", "options": ["中性词", "褒义词", "贬义词", "讽刺词"], "explanation": "讲义将“淡薄”列为中性词，判断时仍要留意具体语境。"}, {"id": 35, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“吹嘘”一般属于哪一种感情色彩？", "correct": "贬义词", "options": ["贬义词", "褒义词", "中性词", "敬辞"], "explanation": "“吹嘘”表示夸耀自己，通常带批评意味。"}, {"id": 36, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“懦弱”一般属于哪一种感情色彩？", "correct": "贬义词", "options": ["贬义词", "褒义词", "中性词", "敬辞"], "explanation": "“懦弱”表示软弱、缺乏勇气，通常含否定意味。"}, {"id": 37, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“见风转舵”一般属于哪一种感情色彩？", "correct": "贬义词", "options": ["贬义词", "褒义词", "中性词", "敬辞"], "explanation": "“见风转舵”常用来批评人随势改变立场，带贬义。"}, {"id": 38, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "句子“你可真聪明，连自己的姓名都忘了写。”中，“聪明”的实际感情色彩是哪一种？", "correct": "贬义色彩", "options": ["贬义色彩", "褒义色彩", "中性色彩", "完全没有感情色彩"], "explanation": "表面上是称赞，实际是讽刺；语境使原本的褒义词转成贬义效果。"}, {"id": 39, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“他为了达到目的，使尽各种手段。”这里“手段”的感情色彩较接近哪一种？", "correct": "贬义色彩", "options": ["贬义色彩", "褒义色彩", "中性色彩", "赞美色彩"], "explanation": "“手段”本来可中性，但在“为了达到目的、使尽各种手段”的语境中带负面意味。"}, {"id": 40, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "妈妈笑着说：“你这个臭小子，又给我准备惊喜。”这里“臭小子”的感情色彩较接近哪一种？", "correct": "亲昵、偏褒义的语气", "options": ["亲昵、偏褒义的语气", "严厉贬义", "完全中性", "正式敬意"], "explanation": "“臭小子”本来带贬义，但在亲密关系和笑着说的语境中转为亲昵。"}, {"id": 41, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "下列哪一组词全部属于褒义词？", "correct": "创新、和谐、温文尔雅", "options": ["创新、和谐、温文尔雅", "吹嘘、懦弱、和谐", "结果、浓烟、动心", "见风转舵、创新、主义"], "explanation": "这三个词都带赞扬或肯定意味。"}, {"id": 42, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "下列哪一组词全部属于中性词？", "correct": "结果、浓烟、动心", "options": ["结果、浓烟、动心", "创新、和谐、结果", "吹嘘、懦弱、动心", "温文尔雅、结果、见风转舵"], "explanation": "“结果、浓烟、动心”本身都不明显带褒贬。"}, {"id": 43, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "下列哪一组词全部属于贬义词？", "correct": "吹嘘、懦弱、见风转舵", "options": ["吹嘘、懦弱、见风转舵", "创新、和谐、大显身手", "结果、主义、浓烟", "温文尔雅、懦弱、动心"], "explanation": "三者都带否定或批评意味。"}, {"id": 44, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "判断词的感情色彩时，最稳妥的方法是哪一个？", "correct": "先看词义，再结合上下文和说话语气", "options": ["先看词义，再结合上下文和说话语气", "只看这个词有没有两个字", "只看句子有没有感叹号", "只看这个词是不是成语"], "explanation": "词语可能因语境发生褒贬变化，所以必须结合本义、上下文和语气判断。"}, {"id": 45, "category": "词的感情色彩", "lesson": "词的感情色彩", "prompt": "“词的感情色彩会随语境变化”这句话说明了什么？", "correct": "同一个词在不同语境中可能出现不同褒贬效果", "options": ["同一个词在不同语境中可能出现不同褒贬效果", "每个词永远只有一种色彩", "只有成语才有感情色彩", "中性词不能发生变化"], "explanation": "讲义特别提醒：褒义、中性、贬义都可能因具体语境而产生变化。"}, {"id": 46, "category": "短语", "lesson": "短语类型", "prompt": "“老师和学生”属于哪一种短语？", "correct": "并列短语", "options": ["并列短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "两部分地位平等，用“和”连接。"}, {"id": 47, "category": "短语", "lesson": "短语类型", "prompt": "“调查研究”属于哪一种短语？", "correct": "并列短语", "options": ["并列短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“调查”和“研究”是两个并列动作，地位平等。"}, {"id": 48, "category": "短语", "lesson": "短语类型", "prompt": "“美丽大方”属于哪一种短语？", "correct": "并列短语", "options": ["并列短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“美丽”和“大方”并列说明特征。"}, {"id": 49, "category": "短语", "lesson": "短语类型", "prompt": "“父母和孩子”属于哪一种短语？", "correct": "并列短语", "options": ["并列短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "两个名词成分并列，没有谁修饰谁。"}, {"id": 50, "category": "短语", "lesson": "短语类型", "prompt": "“读书写字”属于哪一种短语？", "correct": "并列短语", "options": ["并列短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“读书”和“写字”是并列的两个动作。"}, {"id": 51, "category": "短语", "lesson": "短语类型", "prompt": "“整齐美观”属于哪一种短语？", "correct": "并列短语", "options": ["并列短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“整齐”和“美观”是并列的两个性质。"}, {"id": 52, "category": "短语", "lesson": "短语类型", "prompt": "“美丽的校园”属于哪一种短语？", "correct": "偏正短语", "options": ["偏正短语", "并列短语", "主谓短语", "动宾短语"], "explanation": "“美丽的”修饰中心语“校园”。"}, {"id": 53, "category": "短语", "lesson": "短语类型", "prompt": "“认真学习”属于哪一种短语？", "correct": "偏正短语", "options": ["偏正短语", "并列短语", "主谓短语", "动宾短语"], "explanation": "“认真”修饰“学习”，说明怎样学习。"}, {"id": 54, "category": "短语", "lesson": "短语类型", "prompt": "“非常安静”属于哪一种短语？", "correct": "偏正短语", "options": ["偏正短语", "并列短语", "主谓短语", "动宾短语"], "explanation": "“非常”修饰“安静”，表示程度。"}, {"id": 55, "category": "短语", "lesson": "短语类型", "prompt": "“幸福的岁月”属于哪一种短语？", "correct": "偏正短语", "options": ["偏正短语", "并列短语", "主谓短语", "动宾短语"], "explanation": "“幸福的”修饰中心语“岁月”。"}, {"id": 56, "category": "短语", "lesson": "短语类型", "prompt": "“仔细检查”属于哪一种短语？", "correct": "偏正短语", "options": ["偏正短语", "并列短语", "主谓短语", "动宾短语"], "explanation": "“仔细”修饰“检查”，说明怎样检查。"}, {"id": 57, "category": "短语", "lesson": "短语类型", "prompt": "“格外清楚”属于哪一种短语？", "correct": "偏正短语", "options": ["偏正短语", "并列短语", "主谓短语", "动宾短语"], "explanation": "“格外”修饰“清楚”，表示程度。"}, {"id": 58, "category": "短语", "lesson": "短语类型", "prompt": "“天气晴朗”属于哪一种短语？", "correct": "主谓短语", "options": ["主谓短语", "并列短语", "偏正短语", "动宾短语"], "explanation": "“天气”是被说明的对象，“晴朗”说明天气怎么样。"}, {"id": 59, "category": "短语", "lesson": "短语类型", "prompt": "“春天来了”属于哪一种短语？", "correct": "主谓短语", "options": ["主谓短语", "并列短语", "偏正短语", "动宾短语"], "explanation": "“春天”是主语，“来了”说明春天怎样。"}, {"id": 60, "category": "短语", "lesson": "短语类型", "prompt": "“大家欢呼”属于哪一种短语？", "correct": "主谓短语", "options": ["主谓短语", "并列短语", "偏正短语", "动宾短语"], "explanation": "“大家”是对象，“欢呼”说明大家做什么。"}, {"id": 61, "category": "短语", "lesson": "短语类型", "prompt": "“学生们认真”属于哪一种短语？", "correct": "主谓短语", "options": ["主谓短语", "并列短语", "偏正短语", "动宾短语"], "explanation": "“学生们”是被说明对象，“认真”说明他们怎么样。"}, {"id": 62, "category": "短语", "lesson": "短语类型", "prompt": "“河水上涨”属于哪一种短语？", "correct": "主谓短语", "options": ["主谓短语", "并列短语", "偏正短语", "动宾短语"], "explanation": "“河水”是主语，“上涨”说明河水的情况。"}, {"id": 63, "category": "短语", "lesson": "短语类型", "prompt": "“灯光明亮”属于哪一种短语？", "correct": "主谓短语", "options": ["主谓短语", "并列短语", "偏正短语", "动宾短语"], "explanation": "“灯光”是对象，“明亮”说明灯光怎么样。"}, {"id": 64, "category": "短语", "lesson": "短语类型", "prompt": "“阅读文章”属于哪一种短语？", "correct": "动宾短语", "options": ["动宾短语", "并列短语", "偏正短语", "主谓短语"], "explanation": "“阅读”是动词，“文章”是阅读的对象。"}, {"id": 65, "category": "短语", "lesson": "短语类型", "prompt": "“完成作业”属于哪一种短语？", "correct": "动宾短语", "options": ["动宾短语", "并列短语", "偏正短语", "主谓短语"], "explanation": "“完成”支配宾语“作业”。"}, {"id": 66, "category": "短语", "lesson": "短语类型", "prompt": "“热爱祖国”属于哪一种短语？", "correct": "动宾短语", "options": ["动宾短语", "并列短语", "偏正短语", "主谓短语"], "explanation": "“热爱”支配对象“祖国”。"}, {"id": 67, "category": "短语", "lesson": "短语类型", "prompt": "“观看比赛”属于哪一种短语？", "correct": "动宾短语", "options": ["动宾短语", "并列短语", "偏正短语", "主谓短语"], "explanation": "“观看”后面的“比赛”是动作对象。"}, {"id": 68, "category": "短语", "lesson": "短语类型", "prompt": "“整理资料”属于哪一种短语？", "correct": "动宾短语", "options": ["动宾短语", "并列短语", "偏正短语", "主谓短语"], "explanation": "“整理”支配“资料”，问“整理什么”。"}, {"id": 69, "category": "短语", "lesson": "短语类型", "prompt": "“讨论问题”属于哪一种短语？", "correct": "动宾短语", "options": ["动宾短语", "并列短语", "偏正短语", "主谓短语"], "explanation": "“讨论”支配“问题”，问“讨论什么”。"}, {"id": 70, "category": "短语", "lesson": "短语类型", "prompt": "“看清楚”属于哪一种短语？", "correct": "谓补短语", "options": ["谓补短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“清楚”补充说明“看”的结果。"}, {"id": 71, "category": "短语", "lesson": "短语类型", "prompt": "“跑得快”属于哪一种短语？", "correct": "谓补短语", "options": ["谓补短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“快”补充说明“跑”的程度或状态。"}, {"id": 72, "category": "短语", "lesson": "短语类型", "prompt": "“热极了”属于哪一种短语？", "correct": "谓补短语", "options": ["谓补短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“极了”补充说明“热”的程度。"}, {"id": 73, "category": "短语", "lesson": "短语类型", "prompt": "“走进去”属于哪一种短语？", "correct": "谓补短语", "options": ["谓补短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“进去”补充说明“走”的趋向。"}, {"id": 74, "category": "短语", "lesson": "短语类型", "prompt": "“写完了”属于哪一种短语？", "correct": "谓补短语", "options": ["谓补短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“完”补充说明“写”的结果。"}, {"id": 75, "category": "短语", "lesson": "短语类型", "prompt": "“站起来”属于哪一种短语？", "correct": "谓补短语", "options": ["谓补短语", "偏正短语", "主谓短语", "动宾短语"], "explanation": "“起来”补充说明“站”的趋向。"}, {"id": 76, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n临近考试，小敏决定减少刷手机，把时间用在复习上。", "correct": "一寸光阴一寸金", "options": ["一寸光阴一寸金", "路遥知马力，日久见人心", "不经一事，不长一智", "吃得苦中苦，方为人上人"], "explanation": "“一寸光阴一寸金”的意思是：时间十分宝贵。 这个情境与它的核心道理最吻合。"}, {"id": 77, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n他坚持练琴多年，终于在比赛中获得好成绩。", "correct": "有志者事竟成", "options": ["有志者事竟成", "近朱者赤，近墨者黑", "三百六十行，行行出状元", "留得青山在，不怕没柴烧"], "explanation": "“有志者事竟成”的意思是：只要有坚定志向并努力，事情终会成功。 这个情境与它的核心道理最吻合。"}, {"id": 78, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n做活动计划时，老师提醒大家先想好雨天备案。", "correct": "人无远虑，必有近忧", "options": ["人无远虑，必有近忧", "不经一事，不长一智", "吃得苦中苦，方为人上人", "若要人不知，除非己莫为"], "explanation": "“人无远虑，必有近忧”的意思是：没有长远打算，眼前很快会出现忧患。 这个情境与它的核心道理最吻合。"}, {"id": 79, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n不要因为一次见面就断定一个人是否值得信任。", "correct": "路遥知马力，日久见人心", "options": ["路遥知马力，日久见人心", "三百六十行，行行出状元", "留得青山在，不怕没柴烧", "一寸光阴一寸金"], "explanation": "“路遥知马力，日久见人心”的意思是：人品好坏要经过时间考验才看得清。 这个情境与它的核心道理最吻合。"}, {"id": 80, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n和勤奋的同学一起学习后，他也渐渐养成自律习惯。", "correct": "近朱者赤，近墨者黑", "options": ["近朱者赤，近墨者黑", "吃得苦中苦，方为人上人", "若要人不知，除非己莫为", "有志者事竟成"], "explanation": "“近朱者赤，近墨者黑”的意思是：环境和同伴会影响人的习惯与品行。 这个情境与它的核心道理最吻合。"}, {"id": 81, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n第一次办活动出错后，他们认真复盘，第二次明显进步。", "correct": "不经一事，不长一智", "options": ["不经一事，不长一智", "留得青山在，不怕没柴烧", "一寸光阴一寸金", "人无远虑，必有近忧"], "explanation": "“不经一事，不长一智”的意思是：亲身经历事情后会增长经验和见识。 这个情境与它的核心道理最吻合。"}, {"id": 82, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n职业不分高低，只要专心钻研，也能成为专业人才。", "correct": "三百六十行，行行出状元", "options": ["三百六十行，行行出状元", "若要人不知，除非己莫为", "有志者事竟成", "路遥知马力，日久见人心"], "explanation": "“三百六十行，行行出状元”的意思是：任何行业认真钻研都能有所成就。 这个情境与它的核心道理最吻合。"}, {"id": 83, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n训练虽然辛苦，但运动员仍每天坚持。", "correct": "吃得苦中苦，方为人上人", "options": ["吃得苦中苦，方为人上人", "一寸光阴一寸金", "人无远虑，必有近忧", "近朱者赤，近墨者黑"], "explanation": "“吃得苦中苦，方为人上人”的意思是：能经受艰苦磨炼，才更可能取得成就。 这个情境与它的核心道理最吻合。"}, {"id": 84, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n比赛受伤后，他先治疗休养，准备康复后再重新训练。", "correct": "留得青山在，不怕没柴烧", "options": ["留得青山在，不怕没柴烧", "有志者事竟成", "路遥知马力，日久见人心", "不经一事，不长一智"], "explanation": "“留得青山在，不怕没柴烧”的意思是：只要根本条件仍在，未来仍有机会。 这个情境与它的核心道理最吻合。"}, {"id": 85, "category": "谚语和歇后语", "lesson": "谚语", "prompt": "下面情境最适合用哪一句谚语？\n不要抱着侥幸心理做不该做的事。", "correct": "若要人不知，除非己莫为", "options": ["若要人不知，除非己莫为", "人无远虑，必有近忧", "近朱者赤，近墨者黑", "三百六十行，行行出状元"], "explanation": "“若要人不知，除非己莫为”的意思是：做过的事很难永远隐瞒。 这个情境与它的核心道理最吻合。"}, {"id": 86, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n这名骗子恶行曝光后，到处受到责骂和排斥。", "correct": "老鼠过街——人人喊打", "options": ["老鼠过街——人人喊打", "竹篮打水——一场空", "十五个吊桶打水——七上八下", "外甥打灯笼——照舅（旧）"], "explanation": "“老鼠过街——人人喊打”的意思是：坏人坏事受到大家厌恶。 题目情境正好符合这个意思。"}, {"id": 87, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n他明明受了委屈，却因为没有证据，只能把苦闷藏在心里。", "correct": "哑巴吃黄连——有苦说不出", "options": ["哑巴吃黄连——有苦说不出", "姜太公钓鱼——愿者上钩", "黄鼠狼给鸡拜年——没安好心", "猫哭耗子——假慈悲"], "explanation": "“哑巴吃黄连——有苦说不出”的意思是：心里有苦，却无法说明。 题目情境正好符合这个意思。"}, {"id": 88, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n他没保存文件，做了一晚的报告因电脑故障全部丢失。", "correct": "竹篮打水——一场空", "options": ["竹篮打水——一场空", "十五个吊桶打水——七上八下", "外甥打灯笼——照舅（旧）", "泥菩萨过江——自身难保"], "explanation": "“竹篮打水——一场空”的意思是：辛苦一番却毫无结果。 题目情境正好符合这个意思。"}, {"id": 89, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n活动公开说明规则，愿意参加的人自己报名。", "correct": "姜太公钓鱼——愿者上钩", "options": ["姜太公钓鱼——愿者上钩", "黄鼠狼给鸡拜年——没安好心", "猫哭耗子——假慈悲", "骑驴看唱本——走着瞧"], "explanation": "“姜太公钓鱼——愿者上钩”的意思是：心甘情愿接受某种安排或条件。 题目情境正好符合这个意思。"}, {"id": 90, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n成绩公布前，他一直坐立不安，心里十分紧张。", "correct": "十五个吊桶打水——七上八下", "options": ["十五个吊桶打水——七上八下", "外甥打灯笼——照舅（旧）", "泥菩萨过江——自身难保", "老鼠过街——人人喊打"], "explanation": "“十五个吊桶打水——七上八下”的意思是：心情忐忑不安。 题目情境正好符合这个意思。"}, {"id": 91, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n平时欺负人的同学突然送礼求帮忙，大家都怀疑他的动机。", "correct": "黄鼠狼给鸡拜年——没安好心", "options": ["黄鼠狼给鸡拜年——没安好心", "猫哭耗子——假慈悲", "骑驴看唱本——走着瞧", "哑巴吃黄连——有苦说不出"], "explanation": "“黄鼠狼给鸡拜年——没安好心”的意思是：表面友好，实际另有坏心。 题目情境正好符合这个意思。"}, {"id": 92, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n大家问今年流程是否有变，负责人说还是跟去年一样。", "correct": "外甥打灯笼——照舅（旧）", "options": ["外甥打灯笼——照舅（旧）", "泥菩萨过江——自身难保", "老鼠过街——人人喊打", "竹篮打水——一场空"], "explanation": "“外甥打灯笼——照舅（旧）”的意思是：依照旧例，没有改变。 题目情境正好符合这个意思。"}, {"id": 93, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n他先欺负别人，事后又装作关心，让人觉得很虚伪。", "correct": "猫哭耗子——假慈悲", "options": ["猫哭耗子——假慈悲", "骑驴看唱本——走着瞧", "哑巴吃黄连——有苦说不出", "姜太公钓鱼——愿者上钩"], "explanation": "“猫哭耗子——假慈悲”的意思是：假装同情，并非真心。 题目情境正好符合这个意思。"}, {"id": 94, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n他自己的工作都来不及完成，当然也帮不了其他组。", "correct": "泥菩萨过江——自身难保", "options": ["泥菩萨过江——自身难保", "老鼠过街——人人喊打", "竹篮打水——一场空", "十五个吊桶打水——七上八下"], "explanation": "“泥菩萨过江——自身难保”的意思是：自己都顾不过来，更无力帮助别人。 题目情境正好符合这个意思。"}, {"id": 95, "category": "谚语和歇后语", "lesson": "歇后语", "prompt": "下面情境最适合用哪一句歇后语？\n双方各有把握，现在争论也没用，等比赛结果出来再说。", "correct": "骑驴看唱本——走着瞧", "options": ["骑驴看唱本——走着瞧", "哑巴吃黄连——有苦说不出", "姜太公钓鱼——愿者上钩", "黄鼠狼给鸡拜年——没安好心"], "explanation": "“骑驴看唱本——走着瞧”的意思是：结果未定，还要看后续发展。 题目情境正好符合这个意思。"}, {"id": 96, "category": "谚语和歇后语", "lesson": "谚语与歇后语辨析", "prompt": "下列哪一项最能说明“谚语”的特点？", "correct": "一句固定语句直接概括经验、道理或劝诫", "options": ["一句固定语句直接概括经验、道理或劝诫", "通常必须分成谜面和谜底", "一定含有谐音", "一定要用破折号"], "explanation": "谚语通常以完整固定语句直接表达生活经验或道理。"}, {"id": 97, "category": "谚语和歇后语", "lesson": "谚语与歇后语辨析", "prompt": "下列哪一项最能说明“歇后语”的结构特点？", "correct": "通常由前半“谜面”和后半“说明/谜底”组成", "options": ["通常由前半“谜面”和后半“说明/谜底”组成", "只有一个字", "必须押韵", "只能表示赞美"], "explanation": "歇后语常由两部分组成，后半句说明前半句真正要表达的意思。"}, {"id": 98, "category": "谚语和歇后语", "lesson": "谚语与歇后语辨析", "prompt": "“外甥打灯笼——照舅（旧）”主要运用了哪一种歇后语特点？", "correct": "谐音", "options": ["谐音", "排比", "顶真", "设问"], "explanation": "“舅”和“旧”同音，后半句借谐音表达“照旧”。"}, {"id": 99, "category": "谚语和歇后语", "lesson": "谚语与歇后语辨析", "prompt": "判断一句话是谚语还是歇后语时，最先应该观察什么？", "correct": "是否是直接完整说理，或呈现“前提＋说明”的两段结构", "options": ["是否是直接完整说理，或呈现“前提＋说明”的两段结构", "有没有四个字", "有没有人物名字", "有没有逗号"], "explanation": "结构是最直接的判断线索：谚语多直接说理；歇后语常为前后两段。"}, {"id": 100, "category": "谚语和歇后语", "lesson": "谚语与歇后语辨析", "prompt": "歇后语中真正把意思点明的部分通常是哪一个？", "correct": "后半句的说明或谜底", "options": ["后半句的说明或谜底", "第一个字", "标点符号", "前半句的人物名称"], "explanation": "前半句多提供形象或谜面，后半句才把要表达的意思点明。"}, {"id": 101, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n湖面像一面明亮的镜子。", "correct": "比喻", "options": ["比喻", "夸张", "引用", "反问"], "explanation": "把“湖面”比作“镜子”，利用相似点来描写。"}, {"id": 102, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n书本是打开知识大门的钥匙。", "correct": "比喻", "options": ["比喻", "借代", "设问", "顶真"], "explanation": "用“钥匙”比喻“书本”的作用，是暗喻。"}, {"id": 103, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n弯弯的月亮像一只银色的小船。", "correct": "比喻", "options": ["比喻", "引用", "反问", "回文"], "explanation": "“月亮”和“小船”之间以“像”连接，构成明喻。"}, {"id": 104, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n时间像流水一样，从指缝间悄悄溜走。", "correct": "比喻", "options": ["比喻", "设问", "顶真", "比拟"], "explanation": "把“时间”比作“流水”，突出流逝的特点。"}, {"id": 105, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n风在窗外低声诉说。", "correct": "比拟", "options": ["比拟", "反问", "回文", "夸张"], "explanation": "“风”被赋予人的“诉说”动作，是拟人。"}, {"id": 106, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n花儿在清晨向我们点头。", "correct": "比拟", "options": ["比拟", "顶真", "比喻", "借代"], "explanation": "“花儿”做人的“点头”动作，是拟人。"}, {"id": 107, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n夜空中的星星一眨一眨地望着我们。", "correct": "比拟", "options": ["比拟", "回文", "夸张", "引用"], "explanation": "星星被写成人会“眨眼、望”，属于比拟。"}, {"id": 108, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n小草从石缝里挺起胸膛。", "correct": "比拟", "options": ["比拟", "比喻", "借代", "设问"], "explanation": "把“小草”写成人会“挺起胸膛”，属于拟人。"}, {"id": 109, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n教室静得连一根针掉在地上都听得见。", "correct": "夸张", "options": ["夸张", "比拟", "引用", "反问"], "explanation": "把“安静”的程度有意放大，以突出环境十分安静。"}, {"id": 110, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n他的嗓门大得快把屋顶震破了。", "correct": "夸张", "options": ["夸张", "借代", "设问", "顶真"], "explanation": "“震破屋顶”明显超出正常事实，是扩大夸张。"}, {"id": 111, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n我等这个消息仿佛等了一万年。", "correct": "夸张", "options": ["夸张", "引用", "反问", "回文"], "explanation": "故意把等待时间说得极长，突出焦急。"}, {"id": 112, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n他一口气仿佛能跑到天边。", "correct": "夸张", "options": ["夸张", "设问", "顶真", "比喻"], "explanation": "把奔跑能力夸大到不合常理，属于夸张。"}, {"id": 113, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n红领巾们排着整齐的队伍走进礼堂。", "correct": "借代", "options": ["借代", "反问", "回文", "比拟"], "explanation": "“红领巾”用特征代指佩戴红领巾的少先队员。"}, {"id": 114, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n白衣天使们彻夜守在病房里。", "correct": "借代", "options": ["借代", "顶真", "比喻", "夸张"], "explanation": "“白衣天使”以职业特征代指医护人员。"}, {"id": 115, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n全班都知道他是运动场上的“飞毛腿”。", "correct": "借代", "options": ["借代", "回文", "比拟", "引用"], "explanation": "“飞毛腿”用突出特征代指跑得很快的人。"}, {"id": 116, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n绿茵场上的“11号”再次攻入一球。", "correct": "借代", "options": ["借代", "比喻", "夸张", "设问"], "explanation": "用球衣号码代指具体球员，属于相关性代称。"}, {"id": 117, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n“一寸光阴一寸金”，我们更应该珍惜时间。", "correct": "引用", "options": ["引用", "比拟", "借代", "反问"], "explanation": "直接引用谚语来加强说服力。"}, {"id": 118, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n老师常提醒我们：“有志者事竟成。”", "correct": "引用", "options": ["引用", "夸张", "设问", "顶真"], "explanation": "直接引用固定语句来说明坚持的重要。"}, {"id": 119, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n正所谓“近朱者赤，近墨者黑”，交友环境确实会影响一个人。", "correct": "引用", "options": ["引用", "借代", "反问", "回文"], "explanation": "引用谚语支持观点。"}, {"id": 120, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n“人无远虑，必有近忧”提醒我们做事要有长远打算。", "correct": "引用", "options": ["引用", "设问", "顶真", "比喻"], "explanation": "引用熟语作为论据，属于引用。"}, {"id": 121, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n什么是真正的勇敢？是在困难面前仍愿意承担责任。", "correct": "设问", "options": ["设问", "反问", "回文", "比拟"], "explanation": "先提出问题，再自己回答，用来引出重点。"}, {"id": 122, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n谁是这场活动最辛苦的人？当然是一直默默准备的工作人员。", "correct": "设问", "options": ["设问", "顶真", "比喻", "夸张"], "explanation": "问句之后马上作答，是典型自问自答。"}, {"id": 123, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n我们为什么要阅读？因为阅读能开阔视野。", "correct": "设问", "options": ["设问", "回文", "比拟", "借代"], "explanation": "先问后答，目的是引起注意并引出答案。"}, {"id": 124, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n怎样才能减少粗心？先检查题目要求，再逐项核对。", "correct": "设问", "options": ["设问", "比喻", "夸张", "引用"], "explanation": "提出问题后紧接答案，属于设问。"}, {"id": 125, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n难道我们不应该珍惜这次机会吗？", "correct": "反问", "options": ["反问", "比拟", "借代", "设问"], "explanation": "用疑问形式表达肯定意思：我们应该珍惜。"}, {"id": 126, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n这样的错误，难道还能一犯再犯吗？", "correct": "反问", "options": ["反问", "夸张", "引用", "顶真"], "explanation": "表面问句，实际表达“不应该再犯”的确定态度。"}, {"id": 127, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n时间这么宝贵，我们怎能随意浪费呢？", "correct": "反问", "options": ["反问", "借代", "设问", "回文"], "explanation": "用问句加强否定语气：不能浪费时间。"}, {"id": 128, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n面对同伴求助，我们难道可以袖手旁观吗？", "correct": "反问", "options": ["反问", "引用", "顶真", "比喻"], "explanation": "实际意思是“不可以袖手旁观”。"}, {"id": 129, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n学习带来知识，知识改变命运。", "correct": "顶真", "options": ["顶真", "设问", "回文", "比拟"], "explanation": "前一句结尾“知识”成为后一句开头，是“尾接头”。"}, {"id": 130, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n失败带来经验，经验促人成长。", "correct": "顶真", "options": ["顶真", "反问", "比喻", "夸张"], "explanation": "“经验”在前句末尾与后句开头相接。"}, {"id": 131, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n希望产生动力，动力推动行动。", "correct": "顶真", "options": ["顶真", "回文", "比拟", "借代"], "explanation": "前句结尾“动力”接后句开头“动力”。"}, {"id": 132, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n阅读开阔眼界，眼界改变选择。", "correct": "顶真", "options": ["顶真", "比喻", "夸张", "引用"], "explanation": "“眼界”首尾相接，构成顶真。"}, {"id": 133, "category": "修辞", "lesson": "修辞辨认", "prompt": "下列句子主要运用了哪一种修辞？\n客上天然居，居然天上客。", "correct": "回文", "options": ["回文", "比拟", "借代", "设问"], "explanation": "词语次序前后回环倒转，形成回文。"}, {"id": 134, "category": "修辞", "lesson": "修辞辨认", "prompt": "“ABBA”最适合用来帮助记忆哪一种修辞？", "correct": "回文", "options": ["回文", "夸张", "引用", "反问"], "explanation": "笔记用 ABBA 概括回文的前后回环结构。"}, {"id": 135, "category": "修辞", "lesson": "修辞辨认", "prompt": "“前后倒转、回环往复仍能形成有意义的表达”描述的是哪一种修辞？", "correct": "回文", "options": ["回文", "借代", "设问", "顶真"], "explanation": "回文的核心是词序前后回环、倒转。"}, {"id": 136, "category": "成语", "lesson": "第28周成语", "prompt": "根据情境，选择最恰当的成语：\n同学已经因为比赛失误很难过了，他还在旁边冷嘲热讽，甚至故意传播笑话。", "correct": "落井下石", "options": ["落井下石", "机不可失", "美中不足", "道貌岸然"], "explanation": "“落井下石”的意思是：乘人之危，加以陷害。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 137, "category": "成语", "lesson": "第28周成语", "prompt": "根据情境，选择最恰当的成语：\n那位老人小时候没有上过学，年轻时连最简单的字也看不懂。", "correct": "目不识丁", "options": ["目不识丁", "理直气壮", "危在旦夕", "声名狼藉"], "explanation": "“目不识丁”的意思是：形容一个字也不认识。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 138, "category": "成语", "lesson": "第28周成语", "prompt": "根据情境，选择最恰当的成语：\n两人在火车上第一次见面，因为聊得投机，很快成为朋友。", "correct": "萍水相逢", "options": ["萍水相逢", "虚与委蛇", "束手就擒", "危在旦夕"], "explanation": "“萍水相逢”的意思是：素不相识的人偶然相遇。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 139, "category": "成语", "lesson": "第28周成语", "prompt": "根据情境，选择最恰当的成语：\n他每天坚持练习书法，从不因进步缓慢而放弃。", "correct": "锲而不舍", "options": ["锲而不舍", "萍水相逢", "争分夺秒", "一败涂地"], "explanation": "“锲而不舍”的意思是：有恒心、有毅力，坚持不懈。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 140, "category": "成语", "lesson": "第28周成语", "prompt": "根据情境，选择最恰当的成语：\n大病初愈的她脸色苍白，走几步就气喘，看起来十分虚弱。", "correct": "弱不禁风", "options": ["弱不禁风", "落井下石", "美中不足", "道貌岸然"], "explanation": "“弱不禁风”的意思是：形容身体娇嫩、柔弱。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 141, "category": "成语", "lesson": "第29周成语", "prompt": "根据情境，选择最恰当的成语：\n山谷安静、空气清新、没有城市喧闹，游客仿佛来到理想中的安乐之地。", "correct": "世外桃源", "options": ["世外桃源", "美中不足", "轻而易举", "高朋满座"], "explanation": "“世外桃源”的意思是：不受外界干扰、安乐美好的地方或理想世界。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 142, "category": "成语", "lesson": "第29周成语", "prompt": "根据情境，选择最恰当的成语：\n他其实并不认同对方，但为了先完成谈判，只能表面客气地应付。", "correct": "虚与委蛇", "options": ["虚与委蛇", "踌躇满志", "半斤八两", "兴致勃勃"], "explanation": "“虚与委蛇”的意思是：虚情假意地跟人敷衍应酬。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 143, "category": "成语", "lesson": "第29周成语", "prompt": "根据情境，选择最恰当的成语：\n一次考试失败后，他认定自己什么都做不好，连复习也不愿继续。", "correct": "自暴自弃", "options": ["自暴自弃", "旗开得胜", "理直气壮", "信口开河"], "explanation": "“自暴自弃”的意思是：自甘落后，自我放弃。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 144, "category": "成语", "lesson": "第29周成语", "prompt": "根据情境，选择最恰当的成语：\n面对范围很大的复习计划，他按章节逐步完成，每一步都先打稳基础。", "correct": "步步为营", "options": ["步步为营", "道貌岸然", "鸡鸣狗盗", "迫在眉睫"], "explanation": "“步步为营”的意思是：做事谨慎，稳扎稳打。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 145, "category": "成语", "lesson": "第29周成语", "prompt": "根据情境，选择最恰当的成语：\n研究成果终于获奖后，他对自己的表现十分满意，脸上满是自信。", "correct": "踌躇满志", "options": ["踌躇满志", "束手就擒", "高朋满座", "赫赫有名"], "explanation": "“踌躇满志”的意思是：对自己的现状或成就非常得意。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 146, "category": "成语", "lesson": "第30周成语", "prompt": "根据情境，选择最恰当的成语：\n他表面一副正经严肃的样子，私下却经常做不诚实的事。", "correct": "道貌岸然", "options": ["道貌岸然", "争分夺秒", "迫在眉睫", "生龙活虎"], "explanation": "“道貌岸然”的意思是：外表严肃正经，常含贬义。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 147, "category": "成语", "lesson": "第30周成语", "prompt": "根据情境，选择最恰当的成语：\n洪峰即将到来，居民必须马上撤离，已经没有时间继续拖延。", "correct": "迫在眉睫", "options": ["迫在眉睫", "道貌岸然", "步步为营", "信口开河"], "explanation": "“迫在眉睫”的意思是：形容情况非常紧迫。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 148, "category": "成语", "lesson": "第30周成语", "prompt": "根据情境，选择最恰当的成语：\n情况还没调查清楚，负责人提醒大家不要贸然采取行动。", "correct": "轻举妄动", "options": ["轻举妄动", "情景交融", "步步为营", "生龙活虎"], "explanation": "“轻举妄动”的意思是：未经慎重考虑就轻率行动。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 149, "category": "成语", "lesson": "第30周成语", "prompt": "根据情境，选择最恰当的成语：\n警方封锁所有出口后，嫌犯知道无法逃走，只好停止反抗。", "correct": "束手就擒", "options": ["束手就擒", "提心吊胆", "两败俱伤", "名落孙山"], "explanation": "“束手就擒”的意思是：不抵抗，甘愿被捉。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 150, "category": "成语", "lesson": "第30周成语", "prompt": "根据情境，选择最恰当的成语：\n他长期没有收入，却每天从存款中支出，积蓄越来越少。", "correct": "坐吃山空", "options": ["坐吃山空", "弱不禁风", "天渊之别", "机不可失"], "explanation": "“坐吃山空”的意思是：只消费不生产，再多财产也会用完。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 151, "category": "成语", "lesson": "第31周成语", "prompt": "根据情境，选择最恰当的成语：\n两队实力差不多，连续几场比赛的成绩也几乎相同。", "correct": "半斤八两", "options": ["半斤八两", "道貌岸然", "落井下石", "步步为营"], "explanation": "“半斤八两”的意思是：彼此相当，不分上下。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 152, "category": "成语", "lesson": "第31周成语", "prompt": "根据情境，选择最恰当的成语：\n他平时不爱发言，聚会时大多只是安静地听别人说。", "correct": "沉默寡言", "options": ["沉默寡言", "世外桃源", "每况愈下", "信口开河"], "explanation": "“沉默寡言”的意思是：形容很少说话。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 153, "category": "成语", "lesson": "第31周成语", "prompt": "根据情境，选择最恰当的成语：\n老师教了几十年书，处理课堂突发情况十分熟练自然。", "correct": "得心应手", "options": ["得心应手", "轻举妄动", "破涕为笑", "喜出望外"], "explanation": "“得心应手”的意思是：做事熟练，运用自如。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 154, "category": "成语", "lesson": "第31周成语", "prompt": "根据情境，选择最恰当的成语：\n消息传开后，大家到处讨论，整个校园都在议论这件事。", "correct": "沸沸扬扬", "options": ["沸沸扬扬", "咬牙切齿", "世外桃源", "开诚布公"], "explanation": "“沸沸扬扬”的意思是：人声喧闹或议论纷纷。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 155, "category": "成语", "lesson": "第31周成语", "prompt": "根据情境，选择最恰当的成语：\n他总爱说宏大的计划，却很少真正动手完成任何一件事。", "correct": "高谈阔论", "options": ["高谈阔论", "迫在眉睫", "先见之明", "声名狼藉"], "explanation": "“高谈阔论”的意思是：不切实际或漫无边际地大发议论，常含贬义。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 156, "category": "成语", "lesson": "第32周成语", "prompt": "根据情境，选择最恰当的成语：\n这位作家作品众多，在文学界早已非常有名。", "correct": "赫赫有名", "options": ["赫赫有名", "危在旦夕", "半斤八两", "生龙活虎"], "explanation": "“赫赫有名”的意思是：名声很大、十分显赫。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 157, "category": "成语", "lesson": "第32周成语", "prompt": "根据情境，选择最恰当的成语：\n父母去世后，他长期住在亲戚家，生活上处处要看别人脸色。", "correct": "寄人篱下", "options": ["寄人篱下", "理直气壮", "世外桃源", "玩火自焚"], "explanation": "“寄人篱下”的意思是：依附别人生活，处处受限制。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 158, "category": "成语", "lesson": "第32周成语", "prompt": "根据情境，选择最恰当的成语：\n班会中，大家不再绕圈子，而是坦率说出问题与建议。", "correct": "开诚布公", "options": ["开诚布公", "人才济济", "天渊之别", "争分夺秒"], "explanation": "“开诚布公”的意思是：坦白无私、真诚地交换意见。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 159, "category": "成语", "lesson": "第32周成语", "prompt": "根据情境，选择最恰当的成语：\n活动改到周末后，既不影响上课，也方便家长参加。", "correct": "两全其美", "options": ["两全其美", "粉饰太平", "两败俱伤", "得心应手"], "explanation": "“两全其美”的意思是：让双方或两方面都得到好处。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 160, "category": "成语", "lesson": "第32周成语", "prompt": "根据情境，选择最恰当的成语：\n录取名单公布后，他没有看到自己的名字。", "correct": "名落孙山", "options": ["名落孙山", "天渊之别", "半斤八两", "坚韧不拔"], "explanation": "“名落孙山”的意思是：婉指考试没有录取、落榜。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 161, "category": "成语", "lesson": "第33周成语", "prompt": "根据情境，选择最恰当的成语：\n妹妹本来哭个不停，看到妈妈拿出生日礼物后马上笑了起来。", "correct": "破涕为笑", "options": ["破涕为笑", "旗开得胜", "世外桃源", "轻而易举"], "explanation": "“破涕为笑”的意思是：停止哭泣，转而露出笑容。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 162, "category": "成语", "lesson": "第33周成语", "prompt": "根据情境，选择最恰当的成语：\n文章写秋雨、落叶，同时寄托作者深深的思乡之情，景与情融在一起。", "correct": "情景交融", "options": ["情景交融", "束手就擒", "寄人篱下", "目不识丁"], "explanation": "“情景交融”的意思是：景物描写与感情表达紧密结合。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 163, "category": "成语", "lesson": "第33周成语", "prompt": "根据情境，选择最恰当的成语：\n校长整天处理会议、文件、家长事务和学校规划，几乎没有空闲。", "correct": "日理万机", "options": ["日理万机", "赫赫有名", "伤天害理", "步步为营"], "explanation": "“日理万机”的意思是：形容政务或事务非常繁忙。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 164, "category": "成语", "lesson": "第33周成语", "prompt": "根据情境，选择最恰当的成语：\n为了自己的利益，他竟故意伤害无辜的人，行为十分残忍。", "correct": "伤天害理", "options": ["伤天害理", "无恶不作", "萍水相逢", "奄奄一息"], "explanation": "“伤天害理”的意思是：做事极其残忍，违背天理良心。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 165, "category": "成语", "lesson": "第33周成语", "prompt": "根据情境，选择最恰当的成语：\n买卖双方你来我往，不断讨论价格和条件，最后才成交。", "correct": "讨价还价", "options": ["讨价还价", "信口开河", "旗开得胜", "理直气壮"], "explanation": "“讨价还价”的意思是：双方反复争取对自己有利的条件。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 166, "category": "成语", "lesson": "第34周成语", "prompt": "根据情境，选择最恰当的成语：\n他不断散播谣言攻击别人，最后因为证据确凿而失去工作与信誉。", "correct": "玩火自焚", "options": ["玩火自焚", "目不识丁", "伤天害理", "轻而易举"], "explanation": "“玩火自焚”的意思是：冒险做坏事，最后反而害了自己。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 167, "category": "成语", "lesson": "第34周成语", "prompt": "根据情境，选择最恰当的成语：\n记者还没查清事实，他就凭想象随便编出一套说法。", "correct": "信口开河", "options": ["信口开河", "轻而易举", "美中不足", "寄人篱下"], "explanation": "“信口开河”的意思是：不负责任地随口乱说。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 168, "category": "成语", "lesson": "第34周成语", "prompt": "根据情境，选择最恰当的成语：\n受伤的小鸟几乎没有力气，呼吸也十分微弱。", "correct": "奄奄一息", "options": ["奄奄一息", "轻而易举", "理直气壮", "兴致勃勃"], "explanation": "“奄奄一息”的意思是：气息微弱，接近死亡。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 169, "category": "成语", "lesson": "第34周成语", "prompt": "根据情境，选择最恰当的成语：\n老师需要一名主持人，小明马上举手表示愿意负责。", "correct": "自告奋勇", "options": ["自告奋勇", "鸡鸣狗盗", "落井下石", "先见之明"], "explanation": "“自告奋勇”的意思是：主动要求承担任务。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 170, "category": "成语", "lesson": "第34周成语", "prompt": "根据情境，选择最恰当的成语：\n明明问题严重，负责人却只报告好消息，故意让外界以为一切正常。", "correct": "粉饰太平", "options": ["粉饰太平", "遗臭万年", "无恶不作", "高谈阔论"], "explanation": "“粉饰太平”的意思是：掩盖问题，假装一切安定美好。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 171, "category": "成语", "lesson": "第35周成语", "prompt": "根据情境，选择最恰当的成语：\n爷爷寿宴当天，亲友纷纷到来，客厅里坐满了宾客。", "correct": "高朋满座", "options": ["高朋满座", "束手就擒", "迫在眉睫", "天渊之别"], "explanation": "“高朋满座”的意思是：客人很多，场面热闹。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 172, "category": "成语", "lesson": "第35周成语", "prompt": "根据情境，选择最恰当的成语：\n那群人专做偷鸡摸狗的小事，还自以为很有本领。", "correct": "鸡鸣狗盗", "options": ["鸡鸣狗盗", "每况愈下", "目不识丁", "虚与委蛇"], "explanation": "“鸡鸣狗盗”的意思是：微不足道的技能；也可指偷偷摸摸、不正当的行为。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 173, "category": "成语", "lesson": "第35周成语", "prompt": "根据情境，选择最恰当的成语：\n证据完整，他知道自己没有做错，因此面对质疑毫不心虚。", "correct": "理直气壮", "options": ["理直气壮", "摇身一变", "知难而退", "两全其美"], "explanation": "“理直气壮”的意思是：理由充分，说话做事很有底气。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 174, "category": "成语", "lesson": "第35周成语", "prompt": "根据情境，选择最恰当的成语：\n这次旅行安排得很好，只可惜最后一天一直下雨。", "correct": "美中不足", "options": ["美中不足", "机不可失", "得心应手", "坚韧不拔"], "explanation": "“美中不足”的意思是：整体很好，但仍有一点缺憾。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 175, "category": "成语", "lesson": "第35周成语", "prompt": "根据情境，选择最恰当的成语：\n对有三十年经验的老师来说，处理这种课堂问题并不困难。", "correct": "轻而易举", "options": ["轻而易举", "玩火自焚", "高朋满座", "寄人篱下"], "explanation": "“轻而易举”的意思是：事情很容易完成，不费力。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 176, "category": "成语", "lesson": "第36周成语", "prompt": "根据情境，选择最恰当的成语：\n这支研究团队里有许多不同领域的专家，实力非常强。", "correct": "人才济济", "options": ["人才济济", "弱不禁风", "寄人篱下", "日理万机"], "explanation": "“人才济济”的意思是：有才能的人很多。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 177, "category": "成语", "lesson": "第36周成语", "prompt": "根据情境，选择最恰当的成语：\n孩子们一到运动场就精神十足，跑跳不停。", "correct": "生龙活虎", "options": ["生龙活虎", "自告奋勇", "赫赫有名", "讨价还价"], "explanation": "“生龙活虎”的意思是：充满活力，精神旺盛。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 178, "category": "成语", "lesson": "第36周成语", "prompt": "根据情境，选择最恰当的成语：\n弟弟很晚还没回家，全家人都紧张得坐立不安。", "correct": "提心吊胆", "options": ["提心吊胆", "弱不禁风", "先见之明", "踌躇满志"], "explanation": "“提心吊胆”的意思是：十分担心害怕，心里不安。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 179, "category": "成语", "lesson": "第36周成语", "prompt": "根据情境，选择最恰当的成语：\n故事里的恶霸欺压百姓、抢夺财物，几乎什么坏事都干。", "correct": "无恶不作", "options": ["无恶不作", "伤天害理", "生龙活虎", "名落孙山"], "explanation": "“无恶不作”的意思是：坏事做尽。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 180, "category": "成语", "lesson": "第36周成语", "prompt": "根据情境，选择最恰当的成语：\n他很早就备份了所有资料，后来电脑损坏时大家才发现他的判断多么正确。", "correct": "先见之明", "options": ["先见之明", "轻而易举", "天渊之别", "坐吃山空"], "explanation": "“先见之明”的意思是：能预先看出事情发展趋势的眼光。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 181, "category": "成语", "lesson": "第37周成语", "prompt": "根据情境，选择最恰当的成语：\n诈骗者换了公司名称和身份后，又以全新的样子出现。", "correct": "摇身一变", "options": ["摇身一变", "弱不禁风", "锲而不舍", "虚与委蛇"], "explanation": "“摇身一变”的意思是：一下子改变身份或面貌，原讲义多用于坏人改头换面。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 182, "category": "成语", "lesson": "第37周成语", "prompt": "根据情境，选择最恰当的成语：\n对专业技师来说，更换这个简单零件几乎不费力。", "correct": "易如反掌", "options": ["易如反掌", "声名狼藉", "得心应手", "轻举妄动"], "explanation": "“易如反掌”的意思是：非常容易，像翻手掌一样。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 183, "category": "成语", "lesson": "第37周成语", "prompt": "根据情境，选择最恰当的成语：\n救援人员知道时间紧迫，不浪费任何一分钟，立即展开搜救。", "correct": "争分夺秒", "options": ["争分夺秒", "束手就擒", "一笔勾销", "坐吃山空"], "explanation": "“争分夺秒”的意思是：充分利用每一分每一秒。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 184, "category": "成语", "lesson": "第37周成语", "prompt": "根据情境，选择最恰当的成语：\n面对老师连续追问，他因为解释不出来而一句话也说不出。", "correct": "张口结舌", "options": ["张口结舌", "机不可失", "兴致勃勃", "自暴自弃"], "explanation": "“张口结舌”的意思是：因理屈、紧张或惊讶而一时说不出话。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 185, "category": "成语", "lesson": "第37周成语", "prompt": "根据情境，选择最恰当的成语：\n康复过程十分辛苦，但运动员始终坚持训练，从未放弃。", "correct": "坚韧不拔", "options": ["坚韧不拔", "轻而易举", "讨价还价", "喜出望外"], "explanation": "“坚韧不拔”的意思是：意志坚强，不轻易动摇。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 186, "category": "成语", "lesson": "第38周成语", "prompt": "根据情境，选择最恰当的成语：\n两家公司不断恶性削价，最后双方都亏损严重。", "correct": "两败俱伤", "options": ["两败俱伤", "每况愈下", "轻举妄动", "咬牙切齿"], "explanation": "“两败俱伤”的意思是：争斗双方都受到损失。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 187, "category": "成语", "lesson": "第38周成语", "prompt": "根据情境，选择最恰当的成语：\n他长期熬夜后，精神状态一天比一天差。", "correct": "每况愈下", "options": ["每况愈下", "落井下石", "自告奋勇", "粉饰太平"], "explanation": "“每况愈下”的意思是：情况越来越坏。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 188, "category": "成语", "lesson": "第38周成语", "prompt": "根据情境，选择最恰当的成语：\n球队第一场比赛就大胜，为整个赛季开了好头。", "correct": "旗开得胜", "options": ["旗开得胜", "赫赫有名", "生龙活虎", "兴致勃勃"], "explanation": "“旗开得胜”的意思是：事情一开始就取得好成绩。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 189, "category": "成语", "lesson": "第38周成语", "prompt": "根据情境，选择最恰当的成语：\n商家多次欺骗顾客，丑闻曝光后名誉彻底败坏。", "correct": "声名狼藉", "options": ["声名狼藉", "天渊之别", "弱不禁风", "兴致勃勃"], "explanation": "“声名狼藉”的意思是：名声坏到极点。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 190, "category": "成语", "lesson": "第38周成语", "prompt": "根据情境，选择最恰当的成语：\n改进教学方法后，学生前后的学习效果差距非常明显。", "correct": "天渊之别", "options": ["天渊之别", "一败涂地", "先见之明", "玩火自焚"], "explanation": "“天渊之别”的意思是：差别极大。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 191, "category": "成语", "lesson": "第39周成语", "prompt": "根据情境，选择最恰当的成语：\n山洪持续上涨，低洼地区居民随时可能受困。", "correct": "危在旦夕", "options": ["危在旦夕", "喜出望外", "沸沸扬扬", "美中不足"], "explanation": "“危在旦夕”的意思是：危险已经非常迫近。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 192, "category": "成语", "lesson": "第39周成语", "prompt": "根据情境，选择最恰当的成语：\n同学们对天文展览非常感兴趣，一路认真观看、不断提问。", "correct": "兴致勃勃", "options": ["兴致勃勃", "机不可失", "轻而易举", "声名狼藉"], "explanation": "“兴致勃勃”的意思是：兴趣很浓，情绪高涨。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 193, "category": "成语", "lesson": "第39周成语", "prompt": "根据情境，选择最恰当的成语：\n球队准备不足，在决赛中几乎毫无还手之力，输得非常惨。", "correct": "一败涂地", "options": ["一败涂地", "迫在眉睫", "高谈阔论", "世外桃源"], "explanation": "“一败涂地”的意思是：失败得十分惨重。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 194, "category": "成语", "lesson": "第39周成语", "prompt": "根据情境，选择最恰当的成语：\n历史上残害百姓的人，即使一时得势，最终仍会留下千古骂名。", "correct": "遗臭万年", "options": ["遗臭万年", "弱不禁风", "生龙活虎", "众望所归"], "explanation": "“遗臭万年”的意思是：坏名声长久流传，遭后人唾骂。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 195, "category": "成语", "lesson": "第39周成语", "prompt": "根据情境，选择最恰当的成语：\n她工作认真、处事公正，几乎所有人都支持她当班长。", "correct": "众望所归", "options": ["众望所归", "粉饰太平", "世外桃源", "张口结舌"], "explanation": "“众望所归”的意思是：得到大家信任与拥护，是多数人的共同期望。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 196, "category": "成语", "lesson": "第40周成语", "prompt": "根据情境，选择最恰当的成语：\n受骗后，他一提起骗子就气得牙关紧咬，恨意难平。", "correct": "咬牙切齿", "options": ["咬牙切齿", "摇身一变", "易如反掌", "坚韧不拔"], "explanation": "“咬牙切齿”的意思是：形容极其痛恨。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 197, "category": "成语", "lesson": "第40周成语", "prompt": "根据情境，选择最恰当的成语：\n两人把误会说开，决定过去的不愉快全部作废，从头开始。", "correct": "一笔勾销", "options": ["一笔勾销", "虚与委蛇", "两败俱伤", "沉默寡言"], "explanation": "“一笔勾销”的意思是：把过去的账目、恩怨或事项全部取消。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 198, "category": "成语", "lesson": "第40周成语", "prompt": "根据情境，选择最恰当的成语：\n她本来以为自己落选，后来突然收到录取通知，惊喜得跳了起来。", "correct": "喜出望外", "options": ["喜出望外", "踌躇满志", "一败涂地", "玩火自焚"], "explanation": "“喜出望外”的意思是：遇到意料之外的好事而特别高兴。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 199, "category": "成语", "lesson": "第40周成语", "prompt": "根据情境，选择最恰当的成语：\n研究才遇到第一个难题，他就打算放弃，不愿继续尝试。", "correct": "知难而退", "options": ["知难而退", "开诚布公", "无恶不作", "咬牙切齿"], "explanation": "“知难而退”的意思是：知道有困难就退缩。 题目情境中的关键线索与这个意思最吻合。"}, {"id": 200, "category": "成语", "lesson": "第40周成语", "prompt": "根据情境，选择最恰当的成语：\n难得有一次海外交流名额，老师提醒他要立即把握。", "correct": "机不可失", "options": ["机不可失", "理直气壮", "天渊之别", "目不识丁"], "explanation": "“机不可失”的意思是：好机会不能错过。 题目情境中的关键线索与这个意思最吻合。"}];
+
+const state = {
+  round: [],
+  index: 0,
+  correct: 0,
+  wrong: 0,
+  answered: false,
+  sound: true,
+  hitMilestones: new Set(),
+  categoryStats: {}
+};
+
+const $ = s => document.querySelector(s);
+const letters = ["A","B","C","D"];
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function startRound(){
+  state.round = shuffle(BANK).slice(0,50).map(q => ({...q, options:shuffle(q.options)}));
+  state.index = 0; state.correct=0; state.wrong=0; state.answered=false;
+  state.hitMilestones = new Set(); state.categoryStats={};
+  document.querySelectorAll(".milestones span").forEach(x=>x.classList.remove("hit"));
+  $("#result").classList.remove("show");
+  $(".cardBody").style.display = "";
+  render();
+}
+
+function render(){
+  const q = state.round[state.index];
+  state.answered = false;
+  $("#catPill").textContent = q.category;
+  $("#lessonPill").textContent = q.lesson;
+  $("#qnum").textContent = `第 ${state.index+1} 题 / 50`;
+  $("#question").textContent = q.prompt;
+  $("#explain").className = "explain";
+  $("#explain").innerHTML = "";
+  $("#nextBtn").disabled = true;
+  $("#nextBtn").textContent = state.index===49 ? "查看成绩 →" : "下一题 →";
+  const box = $("#options");
+  box.innerHTML = "";
+  q.options.forEach((opt,i)=>{
+    const b=document.createElement("button");
+    b.className="opt";
+    b.innerHTML=`<span class="letter">${letters[i]}</span><span>${escapeHtml(opt)}</span>`;
+    b.addEventListener("click",()=>answer(opt,b));
+    box.appendChild(b);
+  });
+  updateStats();
+}
+
+function answer(opt, btn){
+  if(state.answered) return;
+  state.answered = true;
+  const q = state.round[state.index];
+  const isCorrect = opt===q.correct;
+  if(!state.categoryStats[q.category]) state.categoryStats[q.category]={c:0,t:0};
+  state.categoryStats[q.category].t++;
+  if(isCorrect){
+    state.correct++;
+    state.categoryStats[q.category].c++;
+    btn.classList.add("correct");
+    playBasic(true);
+    checkMilestone();
+  }else{
+    state.wrong++;
+    btn.classList.add("wrong");
+    playBasic(false);
+  }
+
+  [...document.querySelectorAll(".opt")].forEach(b=>{
+    b.classList.add("disabled");
+    b.disabled = true;
+    const txt = b.querySelector("span:last-child").textContent;
+    if(txt===q.correct) b.classList.add("correct");
+  });
+
+  $("#explain").innerHTML =
+    `<div class="answer">${isCorrect ? "✓ 回答正确" : "✗ 回答错误"}｜正确答案：${escapeHtml(q.correct)}</div>
+     <div style="margin-top:7px">${escapeHtml(q.explanation)}</div>
+     <span class="lesson">考点：${escapeHtml(q.lesson)}</span>`;
+  $("#explain").classList.add("show");
+  $("#nextBtn").disabled = false;
+  updateStats();
+}
+
+function next(){
+  if(!state.answered) return;
+  if(state.index>=49){ showResult(); return; }
+  state.index++;
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function updateStats(){
+  const done = state.correct + state.wrong;
+  $("#statProgress").textContent = `${Math.min(state.index+1,50)} / 50`;
+  $("#statCorrect").textContent = state.correct;
+  $("#statWrong").textContent = state.wrong;
+  $("#statRate").textContent = done ? Math.round(state.correct/done*100)+"%" : "0%";
+  $("#progress").style.width = `${done/50*100}%`;
+}
+
+function showResult(){
+  $(".cardBody").style.display = "none";
+  const r=$("#result");
+  r.classList.add("show");
+  const pct=Math.round(state.correct/50*100);
+  const rows=Object.entries(state.categoryStats)
+    .sort((a,b)=>a[0].localeCompare(b[0],"zh"))
+    .map(([cat,v])=>`<div class="breakItem"><b>${escapeHtml(cat)}</b><br>${v.c} / ${v.t} 正确</div>`).join("");
+  r.innerHTML=`
+    <h2>本轮完成</h2>
+    <div class="scoreBig">${state.correct} / 50</div>
+    <div>正确率 ${pct}%</div>
+    <div class="breakdown">${rows}</div>
+    <button class="primary" onclick="startRound()">再来一轮随机 50 题</button>`;
+  $("#progress").style.width="100%";
+}
+
+function checkMilestone(){
+  const m=[3,5,10,20,30].find(x=>x===state.correct && !state.hitMilestones.has(x));
+  if(!m) return;
+  state.hitMilestones.add(m);
+  const el=document.querySelector(`.milestones span[data-m="${m}"]`);
+  if(el) el.classList.add("hit");
+  playMilestone(m);
+  showToast(`🎯 已答对 ${m} 题`);
+}
+
+function showToast(txt){
+  const t=$("#toast");
+  t.textContent=txt;t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),1300);
+}
+
+let audioCtx=null;
+function ctx(){
+  if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function tone(freq,start,dur,type="sine",gain=.055){
+  if(!state.sound) return;
+  const c=ctx(),o=c.createOscillator(),g=c.createGain();
+  o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(0.0001,c.currentTime+start);
+  g.gain.exponentialRampToValueAtTime(gain,c.currentTime+start+.01);
+  g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+start+dur);
+  o.connect(g);g.connect(c.destination);
+  o.start(c.currentTime+start);o.stop(c.currentTime+start+dur+.02);
+}
+function playBasic(ok){
+  if(!state.sound) return;
+  if(ok){tone(660,0,.08,"sine",.025);}
+  else{tone(180,0,.10,"triangle",.025);}
+}
+function playMilestone(m){
+  if(!state.sound) return;
+  const patterns={
+    3:[[523,0,.13]],
+    5:[[587,0,.10],[784,.12,.14]],
+    10:[[523,0,.09],[659,.10,.09],[784,.20,.16]],
+    20:[[392,0,.08],[523,.09,.08],[659,.18,.08],[784,.27,.18]],
+    30:[[523,0,.09],[659,.09,.09],[784,.18,.09],[1047,.27,.23],[784,.52,.12]]
+  };
+  (patterns[m]||[]).forEach(x=>tone(x[0],x[1],x[2],"sine",.07));
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+}
+
+$("#nextBtn").addEventListener("click",next);
+$("#restartBtn").addEventListener("click",()=>{ if(confirm("确定开始新一轮随机 50 题吗？")) startRound(); });
+$("#soundBtn").addEventListener("click",()=>{
+  state.sound=!state.sound;
+  $("#soundBtn").textContent=state.sound ? "🔊 音效：开" : "🔇 音效：关";
+});
+
+startRound();
+</script>
+</body>
+</html>
